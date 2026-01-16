@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from "react";
 import { useThree } from "@react-three/fiber";
 import { MathUtils, Vector3 } from "three";
-import { useStore } from "../state/useStore";
+import { useStore, type Planet } from "../state/useStore";
 import { ApiService, PlanetData } from "../services/api";
 
 // 지구 렌더링 크기 상수 (행성 반지름으로 사용)
@@ -109,7 +109,24 @@ export default function ExoplanetPointsAPI() {
     const exoId = `exo-${planetId}`;
 
     setSelectedId(exoId);
-    setSelectedPlanetData(planet);
+    // Transform PlanetData to Planet type
+    const planetForCard: Planet = {
+      id: exoId,
+      name: `Kepler-${planet.id}`,
+      ra: planet.ra,
+      dec: planet.dec,
+      teq: planet.teq,
+      score: planet.ai_probability,
+      disposition: planet.disposition,
+      coordinates_3d: planet.coordinates_3d,
+      features: {
+        mass: planet.m,
+        radius: planet.r,
+        orbital_period: planet.per,
+        stellar_flux: planet.flux,
+      },
+    };
+    setSelectedPlanetData(planetForCard);
     setShowPlanetCard(true);
 
     // 🪙 Coin collection logic - only in Player mode and if probability >= 0.9

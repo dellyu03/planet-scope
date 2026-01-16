@@ -49,8 +49,8 @@ export default function Rocket({
   forwardAudioRef,
   shiftAudioRef,
 }: {
-  forwardAudioRef: React.RefObject<HTMLAudioElement>;
-  shiftAudioRef: React.RefObject<HTMLAudioElement>;
+  forwardAudioRef: React.RefObject<HTMLAudioElement | null>;
+  shiftAudioRef: React.RefObject<HTMLAudioElement | null>;
 }) {
   const physRef = useRef<Group>(null!);
   const controlsRef = useRef<OrbitControlsImpl | null>(null);

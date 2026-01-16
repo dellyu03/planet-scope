@@ -7,6 +7,7 @@ import {
   SolarPlanetClickHandler,
   ExoplanetClickHandler,
 } from "@/utils/PlanetClickHandler";
+import { PlanetData } from "@/services/api";
 
 export default function PlanetListPanel() {
   const [planets, setPlanets] = useState<Planet[]>([]);
@@ -56,20 +57,20 @@ export default function PlanetListPanel() {
       .then(({ ApiService }) => ApiService.getPlanets(1, 500))
       .then((response) => {
         if (response.success && response.data) {
-          const exoplanets: Planet[] = response.data.map((p: { id: number; rowid: number; ra: number; dec: number; ai_probability: number; disposition: string; coordinates_3d: { x: number; y: number; z: number; }; distance: number; r: number; }) => ({
+          const exoplanets: Planet[] = response.data.map((p: PlanetData) => ({
             id: `exo-${p.id}`, // ID 충돌 방지
             name: `Planet ${p.rowid}`,
             ra: p.ra,
             dec: p.dec,
+            teq: p.teq,
             score: p.ai_probability, // AI 확률을 score로 사용
             disposition: p.disposition,
             coordinates_3d: p.coordinates_3d, // 3D 좌표 추가
-            distance: p.distance, // 거리 데이터 추가
             features: {
-              mass: 0, // 백엔드에서 제공되지 않음
+              mass: p.m || 0,
               radius: p.r,
-              orbital_period: 0, // 백엔드에서 제공되지 않음
-              stellar_flux: 0, // 백엔드에서 제공되지 않음
+              orbital_period: p.per || 0,
+              stellar_flux: p.flux || 0,
             },
           }));
 
@@ -136,55 +137,56 @@ export default function PlanetListPanel() {
           .then(({ ApiService }) => ApiService.getPlanetDetail(planetId))
           .then((response) => {
             if (response.success && response.data) {
-              // API에서 받은 상세 정보를 PlanetCard에 전달
-              setSelectedPlanetData(response.data);
+              // API에서 받은 상세 정보를 Planet 타입으로 변환하여 PlanetCard에 전달
+              const apiData = response.data;
+              const planetForCard: Planet = {
+                id: planet.id,
+                name: planet.name,
+                ra: apiData.ra,
+                dec: apiData.dec,
+                teq: apiData.teq,
+                score: apiData.ai_probability,
+                disposition: apiData.disposition,
+                coordinates_3d: apiData.coordinates_3d,
+                features: {
+                  mass: apiData.m,
+                  radius: apiData.r,
+                  orbital_period: apiData.per,
+                  stellar_flux: apiData.flux,
+                },
+              };
+              setSelectedPlanetData(planetForCard);
             } else {
               // API 호출 실패 시 기본 데이터 사용
-              const planetData = {
-                id: planetId,
-                rowid: planetId,
-                kepler_name: planet.name,
+              const planetForCard: Planet = {
+                id: planet.id,
+                name: planet.name,
                 ra: planet.ra || 0,
                 dec: planet.dec || 0,
                 teq: planet.teq,
                 disposition: planet.disposition || "UNKNOWN",
-                ai_probability: planet.score || 0,
-                r: planet.features?.radius || 0,
-                m: planet.features?.mass || 0,
-                per: planet.features?.orbital_period || 0,
-                flux: planet.features?.stellar_flux || 0,
-                coordinates_3d: {
-                  x: 0,
-                  y: 0,
-                  z: 0,
-                },
+                score: planet.score || 0,
+                coordinates_3d: planet.coordinates_3d || { x: 0, y: 0, z: 0 },
+                features: planet.features,
               };
-              setSelectedPlanetData(planetData);
+              setSelectedPlanetData(planetForCard);
             }
           })
           .catch((error) => {
             console.error("Failed to fetch planet detail:", error);
             // 에러 발생 시 기본 데이터 사용
-            const planetData = {
-              id: planetId,
-              rowid: planetId,
-              kepler_name: planet.name,
+            const planetForCard: Planet = {
+              id: planet.id,
+              name: planet.name,
               ra: planet.ra || 0,
               dec: planet.dec || 0,
               teq: planet.teq,
               disposition: planet.disposition || "UNKNOWN",
-              ai_probability: planet.score || 0,
-              r: planet.features?.radius || 0,
-              m: planet.features?.mass || 0,
-              per: planet.features?.orbital_period || 0,
-              flux: planet.features?.stellar_flux || 0,
-              coordinates_3d: {
-                x: 0,
-                y: 0,
-                z: 0,
-              },
+              score: planet.score || 0,
+              coordinates_3d: planet.coordinates_3d || { x: 0, y: 0, z: 0 },
+              features: planet.features,
             };
-            setSelectedPlanetData(planetData);
+            setSelectedPlanetData(planetForCard);
           });
       }
 

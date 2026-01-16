@@ -99,12 +99,7 @@ export default function OuterSystemPlanets() {
 
     // 태양계 행성이므로 SolarPlanetClickHandler 사용 (PlanetCard 표시 안함)
     const clickHandler = new SolarPlanetClickHandler();
-    const position: [number, number, number] = [
-      g.position.x,
-      g.position.y,
-      g.position.z,
-    ];
-    clickHandler.handleClick(planetData, position);
+    clickHandler.handleClick(planetData);
 
     // 로켓 추적 해제
     setFollowRocket(false);

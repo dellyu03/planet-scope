@@ -170,33 +170,42 @@ export default function ExoplanetPoints({ radius = 25 }: { radius?: number }) {
           .then((response) => {
             const { setSelectedPlanetData: setData } = useStore.getState();
             if (response.success && response.data) {
-              // API에서 받은 상세 정보를 PlanetCard에 전달
-              setData(response.data);
+              // API에서 받은 상세 정보를 Planet 타입으로 변환하여 PlanetCard에 전달
+              const apiData = response.data;
+              const planetData: Planet = {
+                id: p.id,
+                name: p.name,
+                ra: apiData.ra,
+                dec: apiData.dec,
+                teq: apiData.teq,
+                score: apiData.ai_probability,
+                disposition: apiData.disposition,
+                coordinates_3d: apiData.coordinates_3d,
+                features: {
+                  mass: apiData.m,
+                  radius: apiData.r,
+                  orbital_period: apiData.per,
+                  stellar_flux: apiData.flux,
+                },
+              };
+              setData(planetData);
               console.log(
                 "3D Planet clicked - API data loaded:",
                 response.data
               );
             } else {
               // API 호출 실패 시 기본 데이터 사용
-              const planetData = {
-                id: planetId,
-                rowid: planetId,
-                kepler_name: p.name,
+              const planetData: Planet = {
+                id: p.id,
+                name: p.name,
                 ra: p.ra || 0,
                 dec: p.dec || 0,
                 teq: p.teq,
                 disposition:
                   "disposition" in p ? String(p.disposition) : "UNKNOWN",
-                ai_probability: p.score || 0,
-                r: p.features?.radius || 0,
-                m: p.features?.mass || 0,
-                per: p.features?.orbital_period || 0,
-                flux: p.features?.stellar_flux || 0,
-                coordinates_3d: {
-                  x: 0,
-                  y: 0,
-                  z: 0,
-                },
+                score: p.score || 0,
+                coordinates_3d: p.coordinates_3d || { x: 0, y: 0, z: 0 },
+                features: p.features,
               };
               setData(planetData);
             }
@@ -208,25 +217,17 @@ export default function ExoplanetPoints({ radius = 25 }: { radius?: number }) {
             );
             const { setSelectedPlanetData: setData } = useStore.getState();
             // 에러 발생 시 기본 데이터 사용
-            const planetData = {
-              id: planetId,
-              rowid: planetId,
-              kepler_name: p.name,
+            const planetData: Planet = {
+              id: p.id,
+              name: p.name,
               ra: p.ra || 0,
               dec: p.dec || 0,
               teq: p.teq,
               disposition:
                 "disposition" in p ? String(p.disposition) : "UNKNOWN",
-              ai_probability: p.score || 0,
-              r: p.features?.radius || 0,
-              m: p.features?.mass || 0,
-              per: p.features?.orbital_period || 0,
-              flux: p.features?.stellar_flux || 0,
-              coordinates_3d: {
-                x: 0,
-                y: 0,
-                z: 0,
-              },
+              score: p.score || 0,
+              coordinates_3d: p.coordinates_3d || { x: 0, y: 0, z: 0 },
+              features: p.features,
             };
             setData(planetData);
           });

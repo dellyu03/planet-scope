@@ -29,7 +29,7 @@ export default function FavoriteFilter() {
         if (!body) return;
 
         // 외계행성인지 확인 (ra, dec가 있으면 외계행성)
-        const isExoplanet = body.ra !== undefined && body.dec !== undefined;
+        const isExoplanet = 'ra' in body && 'dec' in body && body.ra !== undefined && body.dec !== undefined;
 
         if (isExoplanet) {
             // 외계행성: PlanetListPanel과 동일한 로직 사용

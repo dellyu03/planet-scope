@@ -719,7 +719,7 @@ function CoinCounter() {
   );
 }
 
-function BackgroundSound({ audioRef, volume }: { audioRef: React.RefObject<HTMLAudioElement>; volume: number }) {
+function BackgroundSound({ audioRef, volume }: { audioRef: React.RefObject<HTMLAudioElement | null>; volume: number }) {
   const isSoundOn = useStore((s) => s.isSoundOn);
 
   useEffect(() => {

@@ -1,7 +1,6 @@
 // src/utils/select.ts
 import { sph2cart } from "@/utils/math";
-import type { Planet } from "@/types";
-import type { StateCreator } from "zustand";
+import type { Planet } from "@/state/useStore";
 
 // 공용 상수(카메라 거리 배율, 표면 오프셋)
 export const SURFACE_OFFSET = 0.01;
@@ -24,5 +23,10 @@ export function selectAndFlyTo(
     radius: number,
     set: (partial: Partial<{ selectedId?: string; flyToTarget?: [number, number, number] }>) => void
 ) {
+    if (p.ra === undefined || p.dec === undefined) {
+        // 좌표가 없는 경우 선택만 수행
+        set({ selectedId: p.id });
+        return;
+    }
     set({ selectedId: p.id, flyToTarget: getFlyTarget(p.ra, p.dec, radius) });
 }

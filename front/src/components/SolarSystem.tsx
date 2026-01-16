@@ -399,7 +399,7 @@ export default function SolarSystem({
             body={p}
             texUrl={p.texture}
             isCameraMovingToThis={
-              selectedId === p.id && (isCameraMoving || flyToTarget)
+              selectedId === p.id && (isCameraMoving || !!flyToTarget)
             }
           />
           {p.ring && <SaturnRing body={p} />}

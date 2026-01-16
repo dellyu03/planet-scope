@@ -12,7 +12,7 @@
  */
 
 import React, { Component, useEffect, useMemo, useRef, useState } from "react";
-import { Group, Box3, Vector3 } from "three";
+import { Group, Box3, Vector3, Mesh, Material } from "three";
 import { useGLTF } from "@react-three/drei";
 import { useFrame } from "@react-three/fiber";
 import { useStore } from "@/state/useStore";
@@ -122,15 +122,19 @@ function RocketModelInner({ scaleToMeters = 0.2, rotation = [0, 0, 0] }: Props) 
 
     // Apply opacity to all materials
     groupRef.current.traverse((child) => {
-      if (child.isMesh && child.material) {
-        if (Array.isArray(child.material)) {
-          child.material.forEach((mat) => {
+      if ((child as Mesh).isMesh) {
+        const mesh = child as Mesh;
+        if (mesh.material) {
+          if (Array.isArray(mesh.material)) {
+            mesh.material.forEach((mat: Material & { transparent?: boolean; opacity?: number }) => {
+              mat.transparent = true;
+              mat.opacity = opacityRef.current;
+            });
+          } else {
+            const mat = mesh.material as Material & { transparent?: boolean; opacity?: number };
             mat.transparent = true;
             mat.opacity = opacityRef.current;
-          });
-        } else {
-          child.material.transparent = true;
-          child.material.opacity = opacityRef.current;
+          }
         }
       }
     });
@@ -142,10 +146,14 @@ function RocketModelInner({ scaleToMeters = 0.2, rotation = [0, 0, 0] }: Props) 
 
     const clone = scene.clone(true);
     clone.traverse((o) => {
-      if (o.isMesh) {
-        o.castShadow = true;
-        o.receiveShadow = true;
-        if (o.material) o.material.shadowSide = 2; // DoubleSide
+      if ((o as Mesh).isMesh) {
+        const mesh = o as Mesh;
+        mesh.castShadow = true;
+        mesh.receiveShadow = true;
+        if (mesh.material) {
+          const mat = mesh.material as Material & { shadowSide?: number };
+          mat.shadowSide = 2; // DoubleSide
+        }
       }
     });
 

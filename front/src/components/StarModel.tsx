@@ -3,7 +3,7 @@
 
 import { useMemo } from "react";
 import { useGLTF } from "@react-three/drei";
-import { MeshStandardMaterial } from "three";
+import { MeshStandardMaterial, Mesh } from "three";
 
 interface StarModelProps {
   color: string;
@@ -24,8 +24,8 @@ export default function StarModel({ color, radius }: StarModelProps) {
     });
 
     newScene.traverse((child) => {
-      if ((child as THREE.Mesh).isMesh) {
-        (child as THREE.Mesh).material = material;
+      if ((child as Mesh).isMesh) {
+        (child as Mesh).material = material;
       }
     });
 

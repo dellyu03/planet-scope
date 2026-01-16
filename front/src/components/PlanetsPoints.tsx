@@ -5,8 +5,7 @@ import type { Mesh } from "three";
 import { Color } from "three";
 import { useFrame, useThree } from "@react-three/fiber";
 import { Instances, Instance } from "@react-three/drei";
-import { useStore } from "@/state/useStore";
-import type { Planet } from "@/types";
+import { useStore, type Planet } from "@/state/useStore";
 import { sph2cart, scoreToHSL } from "@/utils/math";
 
 const SURFACE_OFFSET = 0.01;
@@ -36,10 +35,12 @@ export default function PlanetsPoints({ radius = 20 }: { radius?: number }) {
                 if ((p.score ?? 0) < cut) return false;
                 // 즐겨찾기 필터
                 if (showOnlyFavorites && !favorites.has(p.id)) return false;
+                // ra/dec가 없는 행성은 제외
+                if (p.ra === undefined || p.dec === undefined) return false;
                 return true;
             })
             .map((p) => {
-                const [x, y, z] = sph2cart(p.ra, p.dec, r);
+                const [x, y, z] = sph2cart(p.ra!, p.dec!, r);
                 const color = new Color().setStyle(scoreToHSL(p.score)).getStyle();
                 return { p, pos: [x, y, z] as Vec3, color };
             });
@@ -76,7 +77,7 @@ export default function PlanetsPoints({ radius = 20 }: { radius?: number }) {
     const ringRef = useRef<Mesh>(null!);
     const selPlanet = useMemo(() => planets.find((p) => p.id === selectedId), [planets, selectedId]);
     const selPos: Vec3 | undefined = useMemo(() => {
-        if (!selPlanet) return undefined;
+        if (!selPlanet || selPlanet.ra === undefined || selPlanet.dec === undefined) return undefined;
         const [x, y, z] = sph2cart(selPlanet.ra, selPlanet.dec, radius + SURFACE_OFFSET);
         return [x, y, z];
     }, [selPlanet, radius]);

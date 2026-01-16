@@ -1,17 +1,17 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { Suspense, useState, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
 import Scene from "@/components/Scene";
 import LoadingScreen from "@/components/LoadingScreen";
 import Tutorial from "@/components/Tutorial";
 import { useStore } from "@/state/useStore";
 
-export default function Page() {
+function PageContent() {
   const [isLoading, setIsLoading] = useState(true);
   const [showTutorial, setShowTutorial] = useState(false);
   const searchParams = useSearchParams();
-  const { setMode, toggleSound, isSoundOn } = useStore();
+  const { setMode } = useStore();
 
   useEffect(() => {
     // Check if mode query parameter is set
@@ -45,5 +45,13 @@ export default function Page() {
     <main className="h-screen">
       <Scene />
     </main>
+  );
+}
+
+export default function Page() {
+  return (
+    <Suspense fallback={<LoadingScreen onEnter={() => {}} />}>
+      <PageContent />
+    </Suspense>
   );
 }

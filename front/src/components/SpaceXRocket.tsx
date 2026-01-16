@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useMemo } from "react";
-import { Group, Box3, Vector3 } from "three";
+import { Group, Box3, Vector3, Mesh, Material } from "three";
 import { useGLTF } from "@react-three/drei";
 
 type Props = {
@@ -23,10 +23,14 @@ export default function SpaceXRocket({
   const rocket = useMemo(() => {
     const clone = scene.clone(true);
     clone.traverse((o) => {
-      if (o.isMesh) {
-        o.castShadow = true;
-        o.receiveShadow = true;
-        if (o.material) o.material.shadowSide = 2; // DoubleSide
+      if ((o as Mesh).isMesh) {
+        const mesh = o as Mesh;
+        mesh.castShadow = true;
+        mesh.receiveShadow = true;
+        if (mesh.material) {
+          const mat = mesh.material as Material & { shadowSide?: number };
+          mat.shadowSide = 2; // DoubleSide
+        }
       }
     });
 
