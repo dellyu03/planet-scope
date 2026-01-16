@@ -21,7 +21,7 @@ export default function DebugHUD({ radius = 1.6 }: { radius?: number }) {
         const cam = camera.position;
         let front = 0, back = 0;
         for (const p of visible) {
-            const [x, y, z] = sph2cart(p.ra, p.dec, radius + 0.01);
+            const [x, y, z] = sph2cart(p.ra ?? 0, p.dec ?? 0, radius + 0.01);
             const dot = x*cam.x + y*cam.y + z*cam.z; // 카메라와 점의 내적
             if (dot > 0) front++; else back++;
         }
